@@ -23,7 +23,7 @@ def load_results(out_dir: str = "runs") -> pd.DataFrame:
     for f in sorted(Path(out_dir).glob("*/seed*/result.json")):
         r = json.loads(f.read_text(encoding="utf-8"))
         f1, rec = r.pop("val_f1_per_class"), r.pop("val_recall_per_class")
-        r.pop("env", None)
+        r["gpu"] = (r.pop("env", None) or {}).get("gpu")
         r.update({"val_f1_chinee": f1[CHINEE], "val_f1_snake": f1[SNAKE],
                   "val_recall_chinee": rec[CHINEE], "val_recall_snake": rec[SNAKE]})
         rows.append(r)
@@ -38,7 +38,7 @@ def backbones_sheet(res: pd.DataFrame) -> pd.DataFrame:
         "seed": b["seed"], "macro-F1 val": b["val_macro_f1"], "top-1 val": b["val_top1"],
         "F1 Chinee val": b["val_f1_chinee"], "F1 Snake val": b["val_f1_snake"], "best epoch": b["best_epoch"],
         "thời gian train/epoch (s)": b["train_s_per_epoch"], "độ trễ batch-1 fp32 p50 (ms)": b["latency_b1_fp32_p50_ms"],
-        "ghi chú": "công thức nền T00, 1 seed",
+        "GPU": b["gpu"], "ghi chú": "công thức nền T00, 1 seed",
     })
 
 
@@ -87,7 +87,8 @@ def training_sheet(res: pd.DataFrame, design: dict, base: str = "T00") -> pd.Dat
                      "top-1 val": r["val_top1"], "Δ vs T00 (macro-F1)": r["Δ vs T00"],
                      "std T00 qua seed": std, "kết luận so với nhiễu": verdict,
                      "F1 Chinee val": r["val_f1_chinee"], "F1 Snake val": r["val_f1_snake"],
-                     "best epoch": r["best_epoch"], "thời gian train/epoch (s)": r["train_s_per_epoch"]})
+                     "best epoch": r["best_epoch"], "thời gian train/epoch (s)": r["train_s_per_epoch"],
+                     "GPU": r["gpu"]})
     return pd.DataFrame(rows)
 
 
