@@ -69,9 +69,9 @@ def check_split(train_df: pd.DataFrame, val_df: pd.DataFrame, test_df: pd.DataFr
         assert df["Label"].between(0, NUM_CLASSES - 1).all(), f"{s}: Label ngoài 0..{NUM_CLASSES - 1}"
 
     overlap = {
-        "train∩val": len(names["train"] & names["val"]),
-        "train∩test": len(names["train"] & names["test"]),
-        "val∩test": len(names["val"] & names["test"]),
+        "train&val": len(names["train"] & names["val"]),
+        "train&test": len(names["train"] & names["test"]),
+        "val&test": len(names["val"] & names["test"]),
     }
     union = len(names["train"] | names["val"] | names["test"])
     on_disk = set(os.listdir(images_dir))
