@@ -1,0 +1,10 @@
+{
+  "backbone": "swin_tiny_patch4_window7_224.ms_in1k",
+  "sec_per_epoch": 58.70449839125001,
+  "plan_hours": {
+    "Bước 2: T00 x 3 seed": 0.5870449839125002,
+    "Bước 2: ablation 1 seed": 2.152498274345834,
+    "Bước 2: kết hợp": 0.1956816613041667,
+    "Bước 4: F01 x 3 seed": 0.5870449839125002
+  }
+}

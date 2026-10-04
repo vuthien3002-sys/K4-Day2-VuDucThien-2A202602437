@@ -1,0 +1,50 @@
+{
+  "n": {
+    "train": 10501,
+    "val": 3501,
+    "test": 3507
+  },
+  "total": 17509,
+  "ratio": {
+    "train": 0.5997487006682277,
+    "val": 0.19995430921240506,
+    "test": 0.2002969901193672
+  },
+  "overlap": {
+    "train&val": 0,
+    "train&test": 0,
+    "val&test": 0
+  },
+  "union": 17509,
+  "missing": 0,
+  "ratio_warning": [],
+  "image_stats": {
+    "n_sampled": 500,
+    "sizes": {
+      "256x256": 500
+    },
+    "modes": {
+      "RGB": 500
+    },
+    "mean_rgb": [
+      0.3776,
+      0.3881,
+      0.3802
+    ],
+    "std_rgb": [
+      0.2356,
+      0.2344,
+      0.2325
+    ],
+    "imagenet_mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "imagenet_std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "initial_loss": {
+    "initial_loss": 2.2159568548202513,
+    "ln9": 2.1972245773362196,
+    "n_images": 640
+  },
+  "modes": {
+    "bn_layers": 20,
+    "frozen_bn_eval_during_train": true,
+    "head_train_during_train": true,
+    "all_eval_after_evaluate": true
+  }
+}

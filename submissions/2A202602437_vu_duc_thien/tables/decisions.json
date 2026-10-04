@@ -1,0 +1,41 @@
+{
+  "backbone_for_steps_2_to_4": {
+    "value": {
+      "exp_id": "B04",
+      "backbone": "swin_tiny_patch4_window7_224.ms_in1k",
+      "desc": "swin_tiny"
+    },
+    "decided_at": "2026-10-04 03:13:53"
+  },
+  "combo_factors_T12": {
+    "value": [
+      "T04",
+      "T07"
+    ],
+    "decided_at": "2026-10-04 09:56:29"
+  },
+  "final_recipe": {
+    "value": "T07",
+    "decided_at": "2026-10-04 10:04:52"
+  },
+  "final_inference_method": {
+    "value": {
+      "exp_id": "I02a",
+      "method": "5crop",
+      "space": "prob"
+    },
+    "decided_at": "2026-10-04 10:06:58"
+  },
+  "final_recipe_v2": {
+    "value": "T00",
+    "decided_at": "2026-10-04 10:29:54"
+  },
+  "final_inference_method_v2": {
+    "value": {
+      "exp_id": "I03_10crop",
+      "method": "10crop",
+      "space": "logit"
+    },
+    "decided_at": "2026-10-04 10:31:17"
+  }
+}

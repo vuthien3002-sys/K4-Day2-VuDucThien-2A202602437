@@ -99,6 +99,7 @@ def inference_sheet(inf: pd.DataFrame) -> pd.DataFrame:
             "lat_b1_p99_ms": "p99 b1 (ms)", "rel_cost_vs_I00": "chi phí so với I00 (lần)",
             "temperature": "T (khớp trên val)", "ece_before": "ECE val trước TS",
             "ece_crossfit_after": "ECE val sau TS (khớp chéo 2 nửa)"}
+    inf = inf.drop_duplicates(subset=["exp_id", "model"])  # ensemble/EMA giống nhau giữa các lượt Bước 3
     return inf[[c for c in cols if c in inf.columns]].rename(columns=cols)
 
 
@@ -119,8 +120,13 @@ def final_sheet(groups: dict, test_csv: str, val_f1: dict | None = None) -> pd.D
                          "recall Chinee test": m["recall"][CHINEE], "recall Snake test": m["recall"][SNAKE]})
         sub = pd.DataFrame(rows[-len(g.preds):])
         num = sub.select_dtypes("number").drop(columns="seed")
+
+        def agg(v):
+            v = v.dropna()
+            return "" if v.empty else (f"{v.mean():.4f}" if len(v) == 1 else f"{v.mean():.4f} ± {v.std(ddof=1):.4f}")
+
         rows.append({"exp_id": exp, "cấu hình": desc, "seed": f"mean ± std ({len(sub)} seed)",
-                     **{c: f"{num[c].mean():.4f} ± {num[c].std(ddof=1):.4f}" for c in num.columns}})
+                     **{c: agg(num[c]) for c in num.columns}})
     return pd.DataFrame(rows)
 
 
@@ -147,7 +153,8 @@ def summary_sheet(res: pd.DataFrame, inf: pd.DataFrame | None, n: int = 10) -> p
         rows += [{"exp_id": r.exp_id, "loại": "suy luận", "mô tả": f"{r.method_label} ({r.model})",
                   "macro-F1 val": r.macro_f1, "top-1 val": r.top1, "độ trễ b1 p50 (ms)": r.lat_b1_p50_ms,
                   "GMAC": np.nan} for r in inf.itertuples()]
-    s = pd.DataFrame(rows).sort_values("macro-F1 val", ascending=False).head(n).reset_index(drop=True)
+    s = (pd.DataFrame(rows).drop_duplicates(subset=["exp_id", "mô tả"])
+         .sort_values("macro-F1 val", ascending=False).head(n).reset_index(drop=True))
     s.insert(0, "hạng", np.arange(1, len(s) + 1))
     return s
 
