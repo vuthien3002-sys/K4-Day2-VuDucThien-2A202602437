@@ -82,13 +82,16 @@ def training_sheet(res: pd.DataFrame, design: dict, base: str = "T00") -> pd.Dat
         verdict = "mốc" if r["exp_id"] == base else (
             "trong nhiễu (không phân biệt được)" if not abs(r["Δ vs T00"]) > std
             else ("tốt hơn, vượt nhiễu" if r["Δ vs T00"] > 0 else "kém hơn, vượt nhiễu"))
+        note = "mốc; 3 seed để đo nhiễu" if r["exp_id"] == base else "1 seed"
+        if r["gpu"] and "T4" not in str(r["gpu"]):
+            note += f"; chạy trên {r['gpu']} (các lần khác trên T4)"
         rows.append({"exp_id": r["exp_id"], "backbone": r["backbone"].split(".")[0], "trục": axis,
                      "khác T00 ở điểm nào": diff, "seed": r["seed"], "macro-F1 val": r["val_macro_f1"],
                      "top-1 val": r["val_top1"], "Δ vs T00 (macro-F1)": r["Δ vs T00"],
                      "std T00 qua seed": std, "kết luận so với nhiễu": verdict,
                      "F1 Chinee val": r["val_f1_chinee"], "F1 Snake val": r["val_f1_snake"],
                      "best epoch": r["best_epoch"], "thời gian train/epoch (s)": r["train_s_per_epoch"],
-                     "GPU": r["gpu"]})
+                     "GPU": r["gpu"], "ghi chú": note})
     return pd.DataFrame(rows)
 
 
@@ -96,11 +99,22 @@ def inference_sheet(inf: pd.DataFrame) -> pd.DataFrame:
     cols = {"exp_id": "exp_id", "method_label": "phương pháp", "model": "mô hình/checkpoint", "K": "K",
             "macro_f1": "macro-F1 val", "top1": "top-1 val", "ece": "ECE val", "f1_chinee": "F1 Chinee val",
             "f1_snake": "F1 Snake val", "lat_b1_p50_ms": "p50 b1 (ms)", "lat_b1_p95_ms": "p95 b1 (ms)",
-            "lat_b1_p99_ms": "p99 b1 (ms)", "rel_cost_vs_I00": "chi phí so với I00 (lần)",
+            "lat_b1_p99_ms": "p99 b1 (ms)", "throughput_b1": "thông lượng b1 (ảnh/s)",
+            "rel_cost_vs_I00": "chi phí so với I00 (lần)",
             "temperature": "T (khớp trên val)", "ece_before": "ECE val trước TS",
             "ece_crossfit_after": "ECE val sau TS (khớp chéo 2 nửa)"}
-    inf = inf.drop_duplicates(subset=["exp_id", "model"])  # ensemble/EMA giống nhau giữa các lượt Bước 3
+    inf = inf.drop_duplicates(subset=["exp_id", "model"]).copy()  # ensemble/EMA giống nhau giữa các lượt Bước 3
+    inf["throughput_b1"] = 1000.0 / inf["lat_b1_p50_ms"]  # batch 1: một ảnh mỗi lượt suy luận (mọi view)
     return inf[[c for c in cols if c in inf.columns]].rename(columns=cols)
+
+
+def latency_sheet(lat: pd.DataFrame) -> pd.DataFrame:
+    """Bảng Latency với tên cột có đơn vị (GUIDE mục 6.1)."""
+    cols = {"config": "cấu hình", "gpu": "GPU", "dtype": "dtype", "batch": "batch", "img_size": "độ phân giải",
+            "fused_bn": "gộp BN", "k_views": "K (view)", "p50": "p50 (ms)", "p95": "p95 (ms)", "p99": "p99 (ms)",
+            "mean": "trung bình (ms)", "images_per_s": "thông lượng (ảnh/s)", "n_iters": "số lần đo",
+            "warmup": "warmup (lần)", "torch": "torch", "preprocessing": "tiền xử lý"}
+    return lat[[c for c in cols if c in lat.columns]].rename(columns=cols)
 
 
 def final_group(pattern: str, test_csv: str):
